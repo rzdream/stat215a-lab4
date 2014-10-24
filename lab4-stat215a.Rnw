@@ -1,0 +1,65 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[11pt]{article}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%packages
+\usepackage{amsmath,amssymb,graphicx,amsfonts,psfrag,layout,subfigure,array,longtable,lscape,booktabs,dcolumn,hyperref}
+\usepackage{natbib}
+\usepackage[page]{appendix}
+\usepackage{multicol}  
+\usepackage{setspace}
+\usepackage{hyperref, url}
+\usepackage[margin=1in]{geometry} %1 inch margins
+\usepackage{gensymb}
+
+%change encoding
+\usepackage[utf8]{inputenc}
+
+%code chunk margins
+\usepackage{listings}
+
+%macros
+\newcommand{\Adv}{{\mathbf{Adv}}}       
+\newcommand{\prp}{{\mathrm{prp}}}                  
+\newcommand{\calK}{{\cal K}}
+\newcommand{\outputs}{{\Rightarrow}}                
+\newcommand{\getsr}{{\:\stackrel{{\scriptscriptstyle\hspace{0.2em}\$}}{\leftarrow}\:}}
+\newcommand{\andthen}{{\::\;\;}}    %  \: \; for thinspace, medspace, thickspace
+\newcommand{\Rand}[1]{{\mathrm{Rand}[{#1}]}}       % A command with one argument
+\newcommand{\Perm}[1]{{\mathrm{Perm}[{#1}]}}       
+\newcommand{\Randd}[2]{{\mathrm{Rand}[{#1},{#2}]}} % and with two arguments
+\newcommand{\E}{\mathrm{E}}
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\Cov}{\mathrm{Cov}}
+\DeclareMathOperator*{\plim}{plim}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+\title{Lab 4 - Cloud Data\\
+Stat 215A, Fall 2014}
+\date{\today}
+\author{Tim Meyers, Jason Poulos, and Zhao Ruan \\
+\\
+\url{https://github.com/jvpoulos/stat215a-lab4}}
+\maketitle
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+<<=libraries,echo=FALSE,include=FALSE,message=FALSE,warning=FALSE>>=
+library(knitr) 
+library(ggplot2)
+library(dplyr)
+library(foreach)
+library(doParallel)
+library(rlecuyer)
+library(reshape)
+@
+
+<<preliminariesR,echo=FALSE,include=FALSE,message=FALSE,warning=FALSE>>=
+opts_chunk$set(dev="png")
+@
+
+\section{Exploratory Data Analysis}
+
+\section{Modeling}
+
+\end{document}
