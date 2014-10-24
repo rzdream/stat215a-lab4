@@ -62,7 +62,7 @@ opts_chunk$set(dev="png")
 
 \section{Exploratory Data Analysis}
 
-<<setup>>=
+<<setup,echo=FALSE,include=FALSE>>=
 #register cores for parallel processing
 registerDoParallel(4)
 #set location of image files
@@ -79,6 +79,36 @@ import.data <- function(path,col.names) {
   return(data)
 }
 idata <- import.data(image.directory,colnames)
+@
+
+<<map-plot,echo=FALSE,fig.cap='Plot of the expert labels for the presence or absence of clouds, for each MISR image.',out.width="0.49\\linewidth",fig.show="hold",label=map-plot>>=
+#create minimalist map theme
+blank.theme <-
+  theme_bw() +
+  theme(plot.background = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        axis.ticks = element_blank(), 
+        axis.text.x = element_blank(), 
+        axis.text.y = element_blank(),
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank())
+#Image 1
+ggplot(data=NULL) +
+  geom_point(data=filter(idata,image=="image1"), aes(x=x, y=y, colour=label),alpha=0.8,shape=21,size=5) +
+  scale_color_gradient(low="white", high="green") + ggtitle("Image 1") +
+  blank.theme
+#Image 2
+ggplot(data=NULL) +
+  geom_point(data=filter(idata,image=="image2"), aes(x=x, y=y, colour=label),alpha=0.8,shape=21,size=5) +
+  scale_color_gradient(low="white", high="blue") + ggtitle("Image 2") +
+  blank.theme
+#Image 3 
+ggplot(data=NULL) +
+  geom_point(data=filter(idata,image=="image3"), aes(x=x, y=y, colour=label),alpha=0.8,shape=21,size=5) +
+  scale_color_gradient(low="white", high="red") + ggtitle("Image 3") +
+  blank.theme
 @
 \section{Modeling}
 
