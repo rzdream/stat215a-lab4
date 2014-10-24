@@ -50,6 +50,8 @@ library(ggplot2)
 library(dplyr)
 library(foreach)
 library(doParallel)
+library(Rcpp)
+library(microbenchmark)
 library(rlecuyer)
 library(reshape)
 @
@@ -60,6 +62,24 @@ opts_chunk$set(dev="png")
 
 \section{Exploratory Data Analysis}
 
+<<setup>>=
+#register cores for parallel processing
+registerDoParallel(4)
+#set location of image files
+image.directory <- file.path("~/Dropbox/stat215a/lab4/image_data")
+#import image files and append data row-wise
+colnames <- c('y','x','label','ndai','sd','corr','ra.df','ra.cf','ra.bf','ra.af','ra.an')
+import.data <- function(path,col.names) {
+  setwd(path)
+  image.files <- list.files(pattern = "[.]txt$")
+  data <- foreach(i = image.files, .combine = rbind) %dopar%{
+    cbind(read.table(i,header=FALSE,col.names=colnames),image=i)
+  }
+  data$image <- sub('.txt','',data$image,fixed=TRUE)
+  return(data)
+}
+idata <- import.data(image.directory,colnames)
+@
 \section{Modeling}
 
 \end{document}
