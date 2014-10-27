@@ -54,6 +54,7 @@ library(Rcpp)
 library(microbenchmark)
 library(rlecuyer)
 library(reshape)
+library(reshape2)
 @
 
 <<preliminariesR,echo=FALSE,include=FALSE,message=FALSE,warning=FALSE>>=
@@ -62,13 +63,19 @@ opts_chunk$set(dev="png")
 
 \section{Exploratory Data Analysis}
 
+Figure \ref{fig:map-plot-labels} spatially plots the expert labels for the presence or absence of clouds, for each of the three MISR images. In these plots, darker colors represent cloud labels, lighter colors represent no label, and white space represents non--cloud labels. 
+
+Figure \ref{fig:plot-radiance} includes spatial plots of the radiances of each angle and Figure \ref{fig:plot-cor} is a heat map showing the correlations between radiance angles. The spatial plots of radiance angles are almost indistinguishable. Each radiance angle pair are highly correlated (over 0.5 correlation value), although some angles are more correlated than others (e.g.,$an$ is much more correlated with $af$ than it is with $df$.)
+
+How well do the radiance angles and features (i.e., $CORR$, $NSAI$, and $SD$) predict the presence or absence of clouds? Figure \ref{fig:logistic-plots} plots the probabilities from two logistic regression models predicting an indicator variable for the presence of clouds, with radiance angles (left plot) and features (right plot) as regressors. For each regression model, we estimate the predicted probablities for each pixel, and arrange the probabilities in ascending order. We then plot the probablities for each pixel (black line) and show which pixels are labeled cloud (red lines). The plots demonstrate that both models fit the data well, given that most of the cloud labels are clustered at the right--hand side of the graphs. However, the features model provides a much better overall fit of the data since all the cloud labels are clustered a the right--hand side.
+
 <<setup,echo=FALSE,include=FALSE>>=
 #register cores for parallel processing
 registerDoParallel(4)
 #set location of image files
 image.directory <- file.path("~/Dropbox/stat215a/lab4/image_data")
 #import image files and append data row-wise
-colnames <- c('y','x','label','ndai','sd','corr','ra.df','ra.cf','ra.bf','ra.af','ra.an')
+colnames <- c('y','x','label','ndai','sd','corr','df','cf','bf','af','an')
 import.data <- function(path,col.names) {
   setwd(path)
   image.files <- list.files(pattern = "[.]txt$")
@@ -81,7 +88,7 @@ import.data <- function(path,col.names) {
 idata <- import.data(image.directory,colnames)
 @
 
-<<map-plot,echo=FALSE,fig.cap='Plot of the expert labels for the presence or absence of clouds, for each MISR image.',out.width="0.49\\linewidth",fig.show="hold",label=map-plot>>=
+<<map-plot-labels,echo=FALSE,fig.cap='Spatial plot of the expert labels for the presence or absence of clouds, for each MISR image.',out.width="0.49\\linewidth",fig.show="hold">>=
 #create minimalist map theme
 blank.theme <-
   theme_bw() +
@@ -93,7 +100,7 @@ blank.theme <-
         axis.text.x = element_blank(), 
         axis.text.y = element_blank(),
         axis.title.x = element_blank(),
-        axis.title.y = element_blank())
+        axis.title.y = element_blank()) 
 #Image 1
 ggplot(data=NULL) +
   geom_point(data=filter(idata,image=="image1"), aes(x=x, y=y, colour=label),alpha=0.8,shape=21,size=5) +
@@ -110,6 +117,77 @@ ggplot(data=NULL) +
   scale_color_gradient(low="white", high="red") + ggtitle("Image 3") +
   blank.theme
 @
-\section{Modeling}
+
+<<plot-cor,echo=FALSE,fig.cap='Radiance angle correlations.',out.width="0.49\\linewidth",fig.show="hold">>=
+#plot correlation heat map for radiances
+qplot(x=X1, y=X2, data=melt(cor(idata[,7:11])), fill=value, geom="tile",xlab="",ylab="") +scale_fill_continuous("Correlation") 
+@
+
+<<plot-radiance,echo=FALSE,fig.cap='Spatial plot of each radiance angle.',out.width="0.49\\linewidth",fig.show="hold">>=
+#DF
+ggplot(data=NULL) +
+  geom_point(data=idata, aes(x=x, y=y, colour=df),alpha=0.8,shape=21,size=5) +
+  scale_color_gradient(low="white", high="blue") + ggtitle("Radiance angle DF") +
+  blank.theme + theme(legend.title=element_blank())
+#CF
+ggplot(data=NULL) +
+  geom_point(data=idata, aes(x=x, y=y, colour=cf),alpha=0.8,shape=21,size=5) +
+  scale_color_gradient(low="white", high="blue") + ggtitle("Radiance angle CF") +
+  blank.theme + theme(legend.title=element_blank())
+#BF
+ggplot(data=NULL) +
+  geom_point(data=idata, aes(x=x, y=y, colour=bf),alpha=0.8,shape=21,size=5) +
+  scale_color_gradient(low="white", high="blue") + ggtitle("Radiance angle BF") +
+  blank.theme + theme(legend.title=element_blank())
+#AF
+ggplot(data=NULL) +
+  geom_point(data=idata, aes(x=x, y=y, colour=af),alpha=0.8,shape=21,size=5) +
+  scale_color_gradient(low="white", high="blue") + ggtitle("Radiance angle AF") +
+  blank.theme + theme(legend.title=element_blank())
+#AN
+ggplot(data=NULL) +
+  geom_point(data=idata, aes(x=x, y=y, colour=an),alpha=0.8,shape=21,size=5) +
+  scale_color_gradient(low="white", high="blue") + ggtitle("Radiance angle AN") +
+  blank.theme + theme(legend.title=element_blank())
+@
+
+<<logistic-plots,echo=FALSE,fig.cap='Plot of probabilities from logistic regression model predicting expert label for the presence of clouds, with radiance angles (L) and features (R) as regressors. Predicted probablities are arranged in ascending order. Red lines correspond to actual cloud labels and the black line represents predicted probabilities for each pixel. The plots are designed to visualize the overall fit of the corresponding model.',out.width="0.49\\linewidth",fig.show="hold">>=
+#remove obs w/o labels
+idata2 <- idata[idata$label!=0,][3:11]
+#convert label to binary variable indicating cloud
+idata2$label[idata2$label==-1] <- 0
+#estimate model coefficients using maximum likelihood (logistic regression)
+rad.logit <- glm(label ~ df + cf + bf + af + an, data = idata2, family = "binomial")
+feat.logit <- glm(label ~ ndai + sd + corr, data = idata2, family = "binomial")
+#estimate predicted probabilities
+rad.pred <- predict(rad.logit,idata2, type = "response",se=TRUE)
+feat.pred <- predict(feat.logit,idata2, type = "response",se=TRUE)
+#create dataframes to store mean predictions for radiances
+inv.logit <- function(x) exp(x) / (1 + exp(x))
+rpred <- data.frame(mean = inv.logit(rad.pred$fit),
+                   cloud = idata2$label)
+rpred <- rpred[order(rpred$mean), ]
+rpred$id <- seq_along(rpred$mean)
+row.names(rpred) <- NULL
+#create dataframes to store mean predictions for features
+fpred <- data.frame(mean = inv.logit(feat.pred$fit),
+                   cloud = idata2$label)
+fpred <- fpred[order(fpred$mean), ]
+fpred$id <- seq_along(fpred$mean)
+row.names(rpred) <- NULL
+#plot probabilities for radiances
+ggplot(rpred, aes(x = id)) + 
+  geom_line(aes(x = id, y = mean)) + 
+  geom_vline(xintercept = which(rpred$cloud == 1), colour = "red", alpha = .25, size=0.01) +
+  scale_x_discrete(breaks = NULL) + 
+  labs(x = NULL, y = "Prediction") + ggtitle("Radiance angle model")
+#plot probabilities for features
+ggplot(fpred, aes(x = id)) + 
+  geom_line(aes(x = id, y = mean)) + 
+  geom_vline(xintercept = which(fpred$cloud == 1), colour = "red", alpha = .25, size=0.01) +
+  scale_x_discrete(breaks = NULL) + 
+  labs(x = NULL, y = "Prediction") + ggtitle("Features model")
+@
+
 
 \end{document}

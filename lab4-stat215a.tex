@@ -100,18 +100,56 @@ Stat 215A, Fall 2014}
 
 \section{Exploratory Data Analysis}
 
+Figure \ref{fig:map-plot-labels} spatially plots the expert labels for the presence or absence of clouds, for each of the three MISR images. In these plots, darker colors represent cloud labels, lighter colors represent no label, and white space represents non--cloud labels. 
+
+Figure \ref{fig:plot-radiance} includes spatial plots of the radiances of each angle and Figure \ref{fig:plot-cor} is a heat map showing the correlations between radiance angles. The spatial plots of radiance angles are almost indistinguishable. Each radiance angle pair are highly correlated (over 0.5 correlation value), although some angles are more correlated than others (e.g.,$an$ is much more correlated with $af$ than it is with $df$.)
+
+How well do the radiance angles and features (i.e., $CORR$, $NSAI$, and $SD$) predict the presence or absence of clouds? Figure \ref{fig:logistic-plots} plots the probabilities from two logistic regression models predicting an indicator variable for the presence of clouds, with radiance angles (left plot) and features (right plot) as regressors. For each regression model, we estimate the predicted probablities for each pixel, and arrange the probabilities in ascending order. We then plot the probablities for each pixel (black line) and show which pixels are labeled cloud (red lines). The plots demonstrate that both models fit the data well, given that most of the cloud labels are clustered at the right--hand side of the graphs. However, the features model provides a much better overall fit of the data since all the cloud labels are clustered a the right--hand side.
+
 
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[]
 
-\includegraphics[width=0.49\linewidth]{figure/map-plot-1} 
-\includegraphics[width=0.49\linewidth]{figure/map-plot-2} 
-\includegraphics[width=0.49\linewidth]{figure/map-plot-3} \caption[Plot of the expert labels for the presence or absence of clouds, for each MISR image]{Plot of the expert labels for the presence or absence of clouds, for each MISR image.\label{fig:map-plot}}
+\includegraphics[width=0.49\linewidth]{figure/map-plot-labels-1} 
+\includegraphics[width=0.49\linewidth]{figure/map-plot-labels-2} 
+\includegraphics[width=0.49\linewidth]{figure/map-plot-labels-3} \caption[Spatial plot of the expert labels for the presence or absence of clouds, for each MISR image]{Spatial plot of the expert labels for the presence or absence of clouds, for each MISR image.\label{fig:map-plot-labels}}
 \end{figure}
 
 
 \end{knitrout}
-\section{Modeling}
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[]
+
+\includegraphics[width=0.49\linewidth]{figure/plot-cor-1} \caption[Radiance angle correlations]{Radiance angle correlations.\label{fig:plot-cor}}
+\end{figure}
+
+
+\end{knitrout}
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[]
+
+\includegraphics[width=0.49\linewidth]{figure/plot-radiance-1} 
+\includegraphics[width=0.49\linewidth]{figure/plot-radiance-2} 
+\includegraphics[width=0.49\linewidth]{figure/plot-radiance-3} 
+\includegraphics[width=0.49\linewidth]{figure/plot-radiance-4} 
+\includegraphics[width=0.49\linewidth]{figure/plot-radiance-5} \caption[Spatial plot of each radiance angle]{Spatial plot of each radiance angle.\label{fig:plot-radiance}}
+\end{figure}
+
+
+\end{knitrout}
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[]
+
+\includegraphics[width=0.49\linewidth]{figure/logistic-plots-1} 
+\includegraphics[width=0.49\linewidth]{figure/logistic-plots-2} \caption[Plot of probabilities from logistic regression model predicting expert label for the presence of clouds, with radiance angles (L) and features (R) as regressors]{Plot of probabilities from logistic regression model predicting expert label for the presence of clouds, with radiance angles (L) and features (R) as regressors. Predicted probablities are arranged in ascending order. Red lines correspond to actual cloud labels and the black line represents predicted probabilities for each pixel. The plots are designed to visualize the overall fit of the corresponding model.\label{fig:logistic-plots}}
+\end{figure}
+
+
+\end{knitrout}
+
 
 \end{document}
